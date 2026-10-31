@@ -121,6 +121,27 @@
           </button>
         </div>
       </div>
+      <section class="hours-card" aria-labelledby="hours-title" aria-live="polite">
+        <div class="hours-card-head">
+          <h2 id="hours-title">受付時間</h2>
+          <p><span class="pill pill-closed" data-status-pill>確認中</span> <span data-status-text>受付時間を確認しています</span></p>
+        </div>
+        <div class="hours-wrap">
+          <table class="hours">
+            <thead>
+              <tr>
+                <th scope="col"><span class="visually-hidden">時間帯</span></th>
+                <th scope="col" data-day="1">月</th><th scope="col" data-day="2">火</th><th scope="col" data-day="3">水</th><th scope="col" data-day="4">木</th><th scope="col" data-day="5">金</th><th scope="col" data-day="6">土</th><th scope="col" data-day="0">日祝</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">9:30〜12:30</th><td data-day="1"><span class="mark-open" aria-label="診療">●</span></td><td data-day="2"><span class="mark-open" aria-label="診療">●</span></td><td data-day="3"><span class="mark-open" aria-label="診療">●</span></td><td data-day="4"><span class="mark-open" aria-label="診療">●</span></td><td data-day="5"><span class="mark-open" aria-label="診療">●</span></td><td data-day="6"><span class="mark-closed" aria-label="休診">／</span></td><td data-day="0"><span class="mark-closed" aria-label="休診">／</span></td></tr>
+              <tr><th scope="row">14:00〜17:00</th><td data-day="1"><span class="mark-open" aria-label="診療">●</span></td><td data-day="2"><span class="mark-open" aria-label="診療">●</span></td><td data-day="3"><span class="mark-open" aria-label="診療">●</span></td><td data-day="4"><span class="mark-open" aria-label="診療">●</span></td><td data-day="5"><span class="mark-open" aria-label="診療">●</span></td><td data-day="6"><span class="mark-closed" aria-label="休診">／</span></td><td data-day="0"><span class="mark-closed" aria-label="休診">／</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="closed-days"><span class="tag">休診日</span>土曜・日曜・祝日</p>
+      </section>
       <div class="hero-actions" style="margin-top:var(--s3)">
         <a class="btn btn-accent btn-large" href="#reserve">
           <svg width="20" height="20"><use href="#i-calendar"/></svg>WEBで予約する
@@ -131,33 +152,6 @@
       </div>
     </div>
   </section>
-
-  <!-- Today status -->
-  <div class="container status-strip">
-    <div class="status-card" aria-live="polite">
-      <div class="status-item">
-        <span class="status-icon"><svg width="24" height="24"><use href="#i-clock"/></svg></span>
-        <div>
-          <p class="status-label">本日の受付 <span class="pill pill-closed" data-status-pill>確認中</span></p>
-          <p class="status-value" data-status-text>受付時間を確認しています</p>
-        </div>
-      </div>
-      <div class="status-item">
-        <span class="status-icon"><svg width="24" height="24"><use href="#i-calendar"/></svg></span>
-        <div>
-          <p class="status-label">休診日</p>
-          <p class="status-value">土曜・日曜・祝日</p>
-        </div>
-      </div>
-      <div class="status-item">
-        <span class="status-icon"><svg width="24" height="24"><use href="#i-pin"/></svg></span>
-        <div>
-          <p class="status-label">アクセス</p>
-          <p class="status-value">牛込柳町駅 徒歩5分・駐車場あり</p>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <!-- News -->
   <section class="section" id="news" aria-labelledby="news-title">

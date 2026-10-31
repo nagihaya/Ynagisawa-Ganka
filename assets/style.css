@@ -1786,3 +1786,97 @@ a.list-row:hover {
   position: relative;
   z-index: 0;
 }
+
+/* ---------- スライドショー下の受付時間 ---------- */
+.hours-card {
+  max-width: 960px;
+  margin: var(--s3) auto 0;
+  text-align: left;
+}
+
+.hours-card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px var(--s2);
+  margin-bottom: 12px;
+}
+
+.hours-card-head h2 {
+  margin: 0;
+  font-size: var(--title3);
+}
+
+.hours-card-head p {
+  margin: 0;
+  font-size: var(--subhead);
+  color: var(--label-secondary);
+}
+
+.hours-card .hours {
+  min-width: 0;
+}
+
+.hours-card .hours th,
+.hours-card .hours td {
+  padding: 12px 4px;
+}
+
+.hours-card .hours thead th {
+  white-space: nowrap;
+}
+
+.hours-card .hours tbody th {
+  padding-left: 12px;
+}
+
+.closed-days {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 12px 0 0;
+  font-weight: 600;
+}
+
+.hero .hours-card p {
+  max-width: none;
+  font-size: var(--subhead);
+}
+
+.hero .hours-card-head p {
+  margin: 0;
+  color: var(--label-secondary);
+}
+
+.hero .hours-card .closed-days {
+  margin: var(--s2) 0 0;
+  color: var(--label);
+  font-size: var(--callout);
+}
+
+.hours-card .hours tbody th {
+  width: 9em;
+}
+
+@media (min-width: 744px) {
+  .hours-card .hours tbody th {
+    width: 12em;
+    padding-left: var(--s3);
+  }
+}
+
+@media (max-width: 400px) {
+  .hours-card .hours {
+    font-size: var(--footnote);
+  }
+  .hours-card .hours tbody th {
+    width: auto;
+    padding-left: 10px;
+  }
+  .hours-card .hours th,
+  .hours-card .hours td {
+    padding-left: 2px;
+    padding-right: 2px;
+  }
+}

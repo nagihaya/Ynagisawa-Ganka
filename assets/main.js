@@ -23,52 +23,170 @@
     return h + ":" + (m < 10 ? "0" + m : m);
   }
 
-  // 本日の診療状況
-  function renderStatus() {
-    var pill = document.querySelector("[data-status-pill]");
-    var text = document.querySelector("[data-status-text]");
-    if (!pill || !text) return;
+  // 祝日（2026–2027年）。休診扱い
+  var HOLIDAYS = {
+    "2026-01-01": "元日", "2026-01-12": "成人の日", "2026-02-11": "建国記念の日",
+    "2026-02-23": "天皇誕生日", "2026-03-20": "春分の日", "2026-04-29": "昭和の日",
+    "2026-05-03": "憲法記念日", "2026-05-04": "みどりの日", "2026-05-05": "こどもの日",
+    "2026-05-06": "振替休日", "2026-07-20": "海の日", "2026-08-11": "山の日",
+    "2026-09-21": "敬老の日", "2026-09-22": "国民の休日", "2026-09-23": "秋分の日",
+    "2026-10-12": "スポーツの日", "2026-11-03": "文化の日", "2026-11-23": "勤労感謝の日",
+    "2027-01-01": "元日", "2027-01-11": "成人の日", "2027-02-11": "建国記念の日",
+    "2027-02-23": "天皇誕生日", "2027-03-21": "春分の日", "2027-03-22": "振替休日",
+    "2027-04-29": "昭和の日", "2027-05-03": "憲法記念日", "2027-05-04": "みどりの日",
+    "2027-05-05": "こどもの日", "2027-07-19": "海の日", "2027-08-11": "山の日",
+    "2027-09-20": "敬老の日", "2027-09-23": "秋分の日", "2027-10-11": "スポーツの日",
+    "2027-11-03": "文化の日", "2027-11-23": "勤労感謝の日"
+  };
 
-    var now = new Date();
-    var day = now.getDay();
+  // 臨時休診・時間変更（お知らせと合わせて更新する）
+  // am / pm に true を入れるとその枠が休診になる
+  var SPECIAL = {
+    "2026-10-30": { am: true, note: "10月30日（金）は午前休診です。午後は通常どおり受付します。" }
+  };
+
+  function ymd(d) {
+    var m = d.getMonth() + 1;
+    var day = d.getDate();
+    return d.getFullYear() + "-" + (m < 10 ? "0" + m : m) + "-" + (day < 10 ? "0" + day : day);
+  }
+
+  // 指定日の受付枠を返す。closed: 休診理由（なければ null）
+  function sessionsFor(d) {
+    var key = ymd(d);
+    var sp = SPECIAL[key] || {};
+    var base = SCHEDULE[d.getDay()];
+    var holiday = HOLIDAYS[key];
+    var reason = holiday ? "祝日（" + holiday + "）" : (base.length ? null : "定休日");
+    return {
+      note: sp.note || null,
+      am: { range: AM, closed: reason || (sp.am ? "臨時休診" : null) },
+      pm: { range: PM, closed: reason || (sp.pm ? "臨時休診" : null) }
+    };
+  }
+
+  function stateOf(slot, min) {
+    if (slot.closed) return "closed";
+    if (min < slot.range[0]) return "before";
+    if (min < slot.range[1]) return "open";
+    return "after";
+  }
+
+  function nextOpening(now) {
     var min = now.getHours() * 60 + now.getMinutes();
-    var slots = SCHEDULE[day];
-    var open = slots.some(function (s) {
-      return min >= s[0] && min < s[1];
-    });
-
-    pill.textContent = open ? "診療中" : "時間外";
-    pill.className = "pill " + (open ? "pill-open" : "pill-closed");
-
-    if (open) {
-      var cur = slots.filter(function (s) {
-        return min >= s[0] && min < s[1];
-      })[0];
-      text.textContent = "本日 " + fmt(cur[1]) + " まで受付";
-      return;
-    }
-
-    var next = slots.filter(function (s) {
-      return s[0] > min;
-    })[0];
-    if (next) {
-      text.textContent = "本日 " + fmt(next[0]) + " から受付開始";
-      return;
-    }
-    for (var i = 1; i <= 7; i++) {
-      var d = (day + i) % 7;
-      if (SCHEDULE[d].length) {
-        text.textContent =
-          (i === 1 ? "明日" : DAY[d] + "曜日") +
-          " " + fmt(SCHEDULE[d][0][0]) + " から受付開始";
-        return;
+    for (var i = 0; i <= 14; i++) {
+      var d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i);
+      var s = sessionsFor(d);
+      var list = [s.am, s.pm];
+      for (var k = 0; k < list.length; k++) {
+        var slot = list[k];
+        if (slot.closed) continue;
+        if (i === 0 && slot.range[0] <= min) continue;
+        var label = i === 0 ? "本日" : i === 1 ? "明日" : (d.getMonth() + 1) + "月" + d.getDate() + "日（" + DAY[d.getDay()] + "）";
+        return label + " " + fmt(slot.range[0]);
       }
     }
+    return null;
+  }
+
+  var demoNow = null;
+
+  function renderToday() {
+    var root = document.querySelector("[data-today]");
+    if (!root) return;
+    var now = demoNow || new Date();
+    var min = now.getHours() * 60 + now.getMinutes();
+    var s = sessionsFor(now);
+    var am = stateOf(s.am, min);
+    var pm = stateOf(s.pm, min);
+
+    root.querySelector("[data-today-date]").textContent =
+      (now.getMonth() + 1) + "月" + now.getDate() + "日（" + DAY[now.getDay()] + "） " + fmt(min) + " 現在";
+
+    var LABEL = { open: "受付中", before: "受付前", after: "受付終了", closed: "休診" };
+    [["am", am, s.am], ["pm", pm, s.pm]].forEach(function (x) {
+      var el = root.querySelector("[data-session='" + x[0] + "']");
+      var text = x[1] === "closed" ? (x[2].closed === "臨時休診" ? "臨時休診" : "休診") : LABEL[x[1]];
+      el.textContent = text;
+      el.className = "session-state is-" + x[1];
+    });
+
+    var pill = root.querySelector("[data-today-pill]");
+    var msg = root.querySelector("[data-today-message]");
+    var next = nextOpening(now);
+    var pillText, pillClass, text;
+
+    if (am === "closed" && pm === "closed") {
+      pillText = "本日休診";
+      pillClass = "pill-off";
+      text = s.am.closed + "のため休診です。" + (next ? "次の受付は " + next + " からです。" : "");
+    } else if (am === "open" || pm === "open") {
+      var cur = am === "open" ? s.am : s.pm;
+      pillText = "受付中";
+      pillClass = "pill-open";
+      text = fmt(cur.range[1]) + " まで受付しています。";
+    } else if (s.am.closed === "臨時休診" || s.pm.closed === "臨時休診") {
+      var which = s.am.closed ? "午前" : "午後";
+      pillText = which + "休診";
+      pillClass = "pill-warn";
+      text = "本日は" + which + "休診です。" +
+        (which === "午前" && pm === "before"
+          ? "午後は " + fmt(s.pm.range[0]) + " から受付します。"
+          : next ? "次の受付は " + next + " からです。" : "");
+    } else if (am === "after" && pm === "before") {
+      pillText = "昼休み";
+      pillClass = "pill-closed";
+      text = "午後は " + fmt(s.pm.range[0]) + " から受付します。";
+    } else if (am === "before" || pm === "before") {
+      pillText = "受付前";
+      pillClass = "pill-closed";
+      text = next + " から受付します。";
+    } else {
+      pillText = "本日の受付終了";
+      pillClass = "pill-closed";
+      text = next ? "次の受付は " + next + " からです。" : "";
+    }
+
+    pill.textContent = pillText;
+    pill.className = "pill " + pillClass;
+    msg.textContent = text;
+
+    var note = root.querySelector("[data-today-note]");
+    note.hidden = !s.note;
+    note.textContent = s.note || "";
+  }
+
+  function setupToday() {
+    var root = document.querySelector("[data-today]");
+    if (!root) return;
+    var input = root.querySelector("[data-demo-now]");
+    function setDemo(v) {
+      demoNow = v ? new Date(v) : null;
+      if (input) input.value = v || "";
+      renderToday();
+      highlightToday();
+    }
+    if (input) {
+      input.addEventListener("change", function () { setDemo(input.value); });
+    }
+    root.querySelectorAll("[data-demo-sample]").forEach(function (b) {
+      b.addEventListener("click", function () { setDemo(b.dataset.demoSample); });
+    });
+    var reset = root.querySelector("[data-demo-reset]");
+    if (reset) reset.addEventListener("click", function () { setDemo(null); });
+    renderToday();
+    setInterval(function () { if (!demoNow) renderToday(); }, 30000);
   }
 
   // 診療時間表の今日の列を強調
   function highlightToday() {
-    var day = new Date().getDay();
+    var day = (demoNow || new Date()).getDay();
+    document.querySelectorAll(".today").forEach(function (el) {
+      el.classList.remove("today");
+    });
+    document.querySelectorAll("[aria-current='date']").forEach(function (el) {
+      el.removeAttribute("aria-current");
+    });
     document.querySelectorAll("[data-day='" + day + "']").forEach(function (el) {
       el.classList.add("today");
     });
@@ -239,7 +357,7 @@
 
   document.addEventListener("DOMContentLoaded", function () {
     setupCarousel();
-    renderStatus();
+    setupToday();
     highlightToday();
     setupSheet();
     setupFilter();

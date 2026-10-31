@@ -1880,3 +1880,160 @@ a.list-row:hover {
     padding-right: 2px;
   }
 }
+
+/* ---------- 本日の受付状況 ---------- */
+.today-card {
+  max-width: 960px;
+  margin: var(--s3) auto 0;
+  padding: var(--s3);
+  text-align: left;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-l);
+  box-shadow: var(--shadow);
+}
+
+.today-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px var(--s2);
+}
+
+.today-head h2 {
+  margin: 0;
+  font-size: var(--title3);
+}
+
+.today-date {
+  font-size: var(--footnote);
+  color: var(--label-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.today-main {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--s1) 12px;
+  margin: var(--s2) 0;
+}
+
+.today-main .pill {
+  font-size: var(--headline);
+  padding: 6px 14px;
+}
+
+.hero .today-card .today-message {
+  margin: 0;
+  max-width: none;
+  font-size: var(--callout);
+  font-weight: 600;
+  color: var(--label);
+}
+
+.pill-off {
+  color: var(--red);
+  background: rgba(255, 59, 48, 0.12);
+}
+
+.pill-warn {
+  color: #c36a00;
+  background: rgba(255, 149, 0, 0.16);
+}
+
+@media (prefers-color-scheme: dark) {
+  .pill-warn {
+    color: var(--orange);
+  }
+}
+
+.today-sessions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s1);
+}
+
+.session {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    "name state"
+    "time time";
+  align-items: center;
+  gap: 2px var(--s1);
+  padding: 12px var(--s2);
+  border-radius: var(--radius-m);
+  background: var(--bg-secondary);
+}
+
+.session-name {
+  grid-area: name;
+  font-weight: 700;
+}
+
+.session-time {
+  grid-area: time;
+  font-size: var(--footnote);
+  color: var(--label-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.session-state {
+  grid-area: state;
+  justify-self: end;
+  font-size: var(--subhead);
+  font-weight: 700;
+}
+
+.session-state.is-open { color: var(--green); }
+.session-state.is-before { color: var(--label-secondary); }
+.session-state.is-after { color: var(--label-tertiary); }
+.session-state.is-closed { color: var(--red); }
+
+@media (prefers-color-scheme: light) {
+  .session-state.is-open { color: #1f8a3a; }
+  .session-state.is-closed { color: #d0302a; }
+}
+
+.hero .today-card .today-note {
+  margin: 12px 0 0;
+  max-width: none;
+  padding: 12px var(--s2);
+  border-radius: var(--radius-m);
+  background: rgba(255, 149, 0, 0.12);
+  color: var(--label);
+  font-size: var(--subhead);
+}
+
+.demo-clock {
+  margin-top: var(--s2);
+  border-top: 0.5px solid var(--separator);
+  padding-top: var(--s1);
+  font-size: var(--footnote);
+  color: var(--label-secondary);
+}
+
+.demo-clock summary {
+  cursor: pointer;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+.demo-clock-body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s1);
+  align-items: center;
+}
+
+.demo-clock input {
+  font: inherit;
+  min-height: 36px;
+  padding: 0 8px;
+  border-radius: 8px;
+  border: 0.5px solid var(--separator);
+  background: var(--bg);
+  color: var(--label);
+}

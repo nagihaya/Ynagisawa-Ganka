@@ -331,6 +331,15 @@
       });
     });
 
+    root.querySelector("[data-prev]").addEventListener("click", function () {
+      go(index - 1);
+      tick();
+    });
+    root.querySelector("[data-next]").addEventListener("click", function () {
+      go(index + 1);
+      tick();
+    });
+
     toggle.addEventListener("click", function () {
       setPlaying(!playing);
     });

@@ -2037,3 +2037,45 @@ a.list-row:hover {
   background: var(--bg);
   color: var(--label);
 }
+
+/* スライドショーの左右矢印 */
+.carousel-arrow {
+  position: absolute;
+  top: calc((100% - 56px) / 2);
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  color: var(--label);
+  background: var(--material);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.carousel-arrow:active {
+  transform: translateY(-50%) scale(0.92);
+}
+
+.carousel-arrow.prev {
+  left: 12px;
+}
+
+.carousel-arrow.next {
+  right: 12px;
+}
+
+@media (hover: hover) and (min-width: 744px) {
+  .carousel-arrow {
+    opacity: 0.85;
+  }
+  .carousel:hover .carousel-arrow,
+  .carousel-arrow:focus-visible {
+    opacity: 1;
+  }
+}

@@ -82,37 +82,52 @@
 </div>
 
 <main id="main">
-  <!-- Hero -->
-  <section class="hero" aria-labelledby="hero-title">
+  <!-- Hero：院内写真スライドショー -->
+  <section class="hero hero-slides" aria-labelledby="hero-title">
+    <h1 id="hero-title" class="visually-hidden">牛込柳町弁天眼科クリニック</h1>
     <div class="container">
-      <span class="eyebrow">都営大江戸線「牛込柳町駅」徒歩5分</span>
-      <h1 id="hero-title">皆さまの輝く瞳を<br>まもるために</h1>
-      <p>質の高い医療を御提供いたします。</p>
-      <div class="hero-actions">
+      <div class="carousel" aria-roledescription="カルーセル" aria-label="院内写真" data-carousel>
+        <ul class="carousel-track" data-track tabindex="0">
+          <li class="slide" id="slide-1" role="group" aria-roledescription="スライド" aria-label="1 / 4：受付">
+            <div class="slide-photo" style="background:linear-gradient(135deg,#f6eeea,#e7d3ca)">
+              <span class="slide-label">受付</span>
+              <span class="slide-note">院内写真を差し替え予定</span>
+            </div>
+          </li>
+          <li class="slide" id="slide-2" role="group" aria-roledescription="スライド" aria-label="2 / 4：待合室">
+            <div class="slide-photo" style="background:linear-gradient(135deg,#f3ece4,#dcc8b9)">
+              <span class="slide-label">待合室</span>
+              <span class="slide-note">院内写真を差し替え予定</span>
+            </div>
+          </li>
+          <li class="slide" id="slide-3" role="group" aria-roledescription="スライド" aria-label="3 / 4：検査室">
+            <div class="slide-photo" style="background:linear-gradient(135deg,#eef0f2,#d9d4d0)">
+              <span class="slide-label">検査室</span>
+              <span class="slide-note">院内写真を差し替え予定</span>
+            </div>
+          </li>
+          <li class="slide" id="slide-4" role="group" aria-roledescription="スライド" aria-label="4 / 4：診察室">
+            <div class="slide-photo" style="background:linear-gradient(135deg,#f5ebe8,#e0c6bf)">
+              <span class="slide-label">診察室</span>
+              <span class="slide-note">院内写真を差し替え予定</span>
+            </div>
+          </li>
+        </ul>
+        <div class="carousel-controls">
+          <div class="page-control" role="group" aria-label="表示する写真を選ぶ"><button type="button" aria-label="1枚目：受付" data-slide-to="0"></button><button type="button" aria-label="2枚目：待合室" data-slide-to="1"></button><button type="button" aria-label="3枚目：検査室" data-slide-to="2"></button><button type="button" aria-label="4枚目：診察室" data-slide-to="3"></button></div>
+          <button type="button" class="carousel-toggle" data-toggle aria-label="スライドショーを一時停止">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" data-icon-pause><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" data-icon-play hidden><path d="M8 5v14l11-7z"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="hero-actions" style="margin-top:var(--s3)">
         <a class="btn btn-accent btn-large" href="#reserve">
           <svg width="20" height="20"><use href="#i-calendar"/></svg>WEBで予約する
         </a>
         <a class="btn btn-tinted btn-large" href="tel:0355798619">
           <svg width="20" height="20"><use href="#i-phone"/></svg>03-5579-8619
         </a>
-      </div>
-      <div class="hero-visual" role="img" aria-label="院内写真（差し替え予定）">
-        <svg viewBox="0 0 880 385" preserveAspectRatio="xMidYMid slice" width="100%" height="100%" aria-hidden="true">
-          <defs>
-            <radialGradient id="glow" cx="30%" cy="20%" r="60%">
-              <stop offset="0" stop-color="#fff" stop-opacity=".9"/>
-              <stop offset="1" stop-color="#fff" stop-opacity="0"/>
-            </radialGradient>
-          </defs>
-          <rect width="880" height="385" fill="url(#glow)"/>
-          <rect x="560" y="70" width="150" height="250" rx="6" fill="#fff" opacity=".55"/>
-          <rect x="580" y="90" width="110" height="140" rx="4" fill="#f3e4d6" opacity=".9"/>
-          <circle cx="200" cy="60" r="10" fill="#fff" opacity=".9"/>
-          <circle cx="420" cy="60" r="10" fill="#fff" opacity=".9"/>
-          <text x="120" y="250" font-family="-apple-system, 'Hiragino Sans', sans-serif" font-size="30" fill="#b1897f" font-weight="600">牛込柳町弁天</text>
-          <text x="120" y="292" font-family="-apple-system, 'Hiragino Sans', sans-serif" font-size="30" fill="#b1897f" font-weight="600">眼科クリニック</text>
-          <text x="120" y="340" font-family="-apple-system, 'Hiragino Sans', sans-serif" font-size="14" fill="#8e6157">院内写真を差し替え予定</text>
-        </svg>
       </div>
     </div>
   </section>

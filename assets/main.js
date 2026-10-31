@@ -155,7 +155,90 @@
     });
   }
 
+  // 院内写真スライドショー（スワイプ対応・自動送り・一時停止）
+  function setupCarousel() {
+    var root = document.querySelector("[data-carousel]");
+    if (!root) return;
+    var track = root.querySelector("[data-track]");
+    var slides = track.children;
+    var dots = root.querySelectorAll("[data-slide-to]");
+    var toggle = root.querySelector("[data-toggle]");
+    var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var index = 0;
+    var playing = !reduce;
+    var hold = false;
+    var timer = null;
+
+    function go(i) {
+      index = (i + slides.length) % slides.length;
+      track.scrollTo({ left: track.clientWidth * index, behavior: reduce ? "auto" : "smooth" });
+    }
+
+    function mark() {
+      dots.forEach(function (d, i) {
+        d.setAttribute("aria-current", String(i === index));
+      });
+    }
+
+    function tick() {
+      clearInterval(timer);
+      if (playing) {
+        timer = setInterval(function () {
+          if (!hold && !document.hidden) go(index + 1);
+        }, 5000);
+      }
+    }
+
+    function setPlaying(v) {
+      playing = v;
+      toggle.setAttribute("aria-label", v ? "スライドショーを一時停止" : "スライドショーを再生");
+      toggle.querySelector("[data-icon-pause]").hidden = !v;
+      toggle.querySelector("[data-icon-play]").hidden = v;
+      tick();
+    }
+
+    var scrollTimer = null;
+    track.addEventListener("scroll", function () {
+      clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(function () {
+        index = Math.round(track.scrollLeft / track.clientWidth);
+        mark();
+      }, 80);
+    });
+
+    dots.forEach(function (d) {
+      d.addEventListener("click", function () {
+        go(Number(d.dataset.slideTo));
+        tick();
+      });
+    });
+
+    toggle.addEventListener("click", function () {
+      setPlaying(!playing);
+    });
+
+    track.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowRight") { go(index + 1); tick(); }
+      if (e.key === "ArrowLeft") { go(index - 1); tick(); }
+    });
+
+    ["pointerenter", "focusin", "touchstart"].forEach(function (ev) {
+      root.addEventListener(ev, function () { hold = true; }, { passive: true });
+    });
+    ["pointerleave", "focusout", "touchend"].forEach(function (ev) {
+      root.addEventListener(ev, function () { hold = false; }, { passive: true });
+    });
+
+    window.addEventListener("resize", function () {
+      track.scrollTo({ left: track.clientWidth * index, behavior: "auto" });
+    });
+
+    mark();
+    setPlaying(playing);
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
+    setupCarousel();
     renderStatus();
     highlightToday();
     setupSheet();

@@ -1653,3 +1653,136 @@ a.list-row:hover {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* ---------- 院内写真スライドショー ---------- */
+.hero-slides {
+  padding: var(--s3) 0 var(--s6);
+}
+
+.carousel {
+  position: relative;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.carousel-track {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-radius: var(--radius-l);
+  box-shadow: var(--shadow);
+  scrollbar-width: none;
+}
+
+.carousel-track::-webkit-scrollbar {
+  display: none;
+}
+
+.slide {
+  flex: 0 0 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+.slide-photo {
+  aspect-ratio: 16 / 9;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: var(--s3);
+  color: var(--tint-strong);
+}
+
+@media (max-width: 599px) {
+  .slide-photo {
+    aspect-ratio: 4 / 3;
+  }
+}
+
+.slide-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.slide-label {
+  font-size: var(--title2);
+  font-weight: 700;
+}
+
+.slide-note {
+  font-size: var(--footnote);
+}
+
+.carousel-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s1);
+  margin-top: 12px;
+}
+
+.page-control {
+  display: flex;
+  gap: 2px;
+  padding: 0 6px;
+  border-radius: 980px;
+  background: var(--fill);
+}
+
+.page-control button {
+  width: 28px;
+  height: 28px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+
+.page-control button::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--label-tertiary);
+  transition: background 0.2s ease, width 0.2s ease;
+}
+
+.page-control button[aria-current="true"]::before {
+  width: 20px;
+  border-radius: 4px;
+  background: var(--tint-strong);
+}
+
+.carousel-toggle {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--label-secondary);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+
+.carousel-toggle::before {
+  content: "";
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--fill);
+  z-index: -1;
+}
+
+.carousel-toggle {
+  position: relative;
+  z-index: 0;
+}

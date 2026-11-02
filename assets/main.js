@@ -2,19 +2,18 @@
 (function () {
   "use strict";
 
-  // 診療時間（0=日曜）。[開始, 終了] は分単位
-  // 受付 9:30–12:30 / 14:00–17:00（月〜金）、土日祝休診
+  // 受付時間・臨時休診・お知らせは assets/data.js（編集画面で更新）から読み込む
+  var DATA = null;
   var AM = [570, 750];
   var PM = [840, 1020];
-  var SCHEDULE = {
-    0: [],
-    1: [AM, PM],
-    2: [AM, PM],
-    3: [AM, PM],
-    4: [AM, PM],
-    5: [AM, PM],
-    6: []
-  };
+  var SPECIAL = {};
+  var STORAGE_KEY = "benten-demo-data";
+
+  function toMin(t) {
+    var p = String(t || "0:0").split(":");
+    return Number(p[0]) * 60 + Number(p[1] || 0);
+  }
+
   var DAY = ["日", "月", "火", "水", "木", "金", "土"];
 
   function fmt(min) {
@@ -39,12 +38,6 @@
     "2027-11-03": "文化の日", "2027-11-23": "勤労感謝の日"
   };
 
-  // 臨時休診・時間変更（お知らせと合わせて更新する）
-  // am / pm に true を入れるとその枠が休診になる
-  var SPECIAL = {
-    "2026-10-30": { am: true, note: "10月30日（金）は午前休診です。午後は通常どおり受付します。" }
-  };
-
   function ymd(d) {
     var m = d.getMonth() + 1;
     var day = d.getDate();
@@ -55,13 +48,13 @@
   function sessionsFor(d) {
     var key = ymd(d);
     var sp = SPECIAL[key] || {};
-    var base = SCHEDULE[d.getDay()];
-    var holiday = HOLIDAYS[key];
-    var reason = holiday ? "祝日（" + holiday + "）" : (base.length ? null : "定休日");
+    var week = (DATA && DATA.hours.week[d.getDay()]) || { am: false, pm: false };
+    var holiday = DATA && DATA.hours.holidayClosed !== false ? HOLIDAYS[key] : null;
+    var reason = holiday ? "祝日（" + holiday + "）" : null;
     return {
       note: sp.note || null,
-      am: { range: AM, closed: reason || (sp.am ? "臨時休診" : null) },
-      pm: { range: PM, closed: reason || (sp.pm ? "臨時休診" : null) }
+      am: { range: AM, closed: reason || (sp.am ? "臨時休診" : week.am ? null : "定休日") },
+      pm: { range: PM, closed: reason || (sp.pm ? "臨時休診" : week.pm ? null : "定休日") }
     };
   }
 
@@ -357,8 +350,93 @@
     setPlaying(playing);
   }
 
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  // 休診の曜日を「土曜・日曜・祝日」の形で返す
+  function closedText(short) {
+    var order = [1, 2, 3, 4, 5, 6, 0];
+    var names = order.filter(function (d) {
+      var w = DATA.hours.week[d];
+      return !w.am && !w.pm;
+    }).map(function (d) { return short ? DAY[d] : DAY[d] + "曜"; });
+    if (DATA.hours.holidayClosed !== false) names.push(short ? "祝" : "祝日");
+    return short ? names.join("") : names.join("・");
+  }
+
+  function renderWeekTables() {
+    var order = [1, 2, 3, 4, 5, 6, 0];
+    var rows = [["am", AM], ["pm", PM]].map(function (x) {
+      var cells = order.map(function (d) {
+        var on = DATA.hours.week[d][x[0]];
+        return '<td data-day="' + d + '">' + (on
+          ? '<span class="mark-open" aria-label="診療">●</span>'
+          : '<span class="mark-closed" aria-label="休診">／</span>') + "</td>";
+      }).join("");
+      return '<tr><th scope="row">' + fmt(x[1][0]) + "〜" + fmt(x[1][1]) + "</th>" + cells + "</tr>";
+    }).join("");
+    document.querySelectorAll("[data-week-body]").forEach(function (tb) {
+      tb.innerHTML = rows;
+    });
+  }
+
+  function renderNews() {
+    var box = document.querySelector("[data-news]");
+    if (!box) return;
+    box.innerHTML = DATA.news.map(function (n) {
+      var date = n.date ? '<span class="detail news-date">' + esc(n.date.replace(/-/g, ".")) + "</span>" : "";
+      return '<details><summary><svg class="chevron" width="16" height="16"><use href="#i-chevron"/></svg>' +
+        '<span class="grow">' + date + esc(n.title) + "</span></summary>" +
+        '<p class="news-body">' + esc(n.body).replace(/\n/g, "<br>") + "</p></details>";
+    }).join("");
+  }
+
+  function applyData(data) {
+    DATA = data;
+    AM = [toMin(data.hours.am.start), toMin(data.hours.am.end)];
+    PM = [toMin(data.hours.pm.start), toMin(data.hours.pm.end)];
+    SPECIAL = {};
+    (data.special || []).forEach(function (s) {
+      if (s.date) SPECIAL[s.date] = s;
+    });
+    document.querySelectorAll("[data-text='hours']").forEach(function (el) {
+      el.textContent = fmt(AM[0]) + "〜" + fmt(AM[1]) + "／" + fmt(PM[0]) + "〜" + fmt(PM[1]);
+    });
+    document.querySelectorAll("[data-text='closed']").forEach(function (el) {
+      el.textContent = closedText(false);
+    });
+    document.querySelectorAll("[data-text='closed-short']").forEach(function (el) {
+      el.textContent = closedText(true);
+    });
+    renderWeekTables();
+    renderNews();
+    renderToday();
+    highlightToday();
+  }
+
+  // 保存済みの編集内容（このブラウザ）があれば優先
+  function loadData() {
+    var base = window.CLINIC_DATA;
+    try {
+      var saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+    return base;
+  }
+
+  // 編集画面のプレビューから届いたデータを反映
+  window.addEventListener("message", function (e) {
+    if (e.data && e.data.type === "clinic-preview" && e.data.data) {
+      applyData(e.data.data);
+    }
+  });
+
   document.addEventListener("DOMContentLoaded", function () {
     setupCarousel();
+    if (window.CLINIC_DATA) applyData(loadData());
     setupToday();
     highlightToday();
     setupSheet();

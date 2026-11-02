@@ -10,6 +10,7 @@
   <title>牛込柳町弁天眼科クリニック｜リニューアル提案デモ</title>
   <meta name="description" content="牛込柳町弁天眼科クリニック ウェブサイトリニューアルの提案用デモ（非公式）。">
   <link rel="stylesheet" href="assets/style.css">
+  <script src="assets/data.js"></script>
   <script src="assets/main.js" defer></script>
 </head>
 <body>
@@ -55,7 +56,7 @@
         <svg width="26" height="26"><use href="#i-phone"/></svg>
         <span>
           <span class="tel-number">03-5579-8619</span>
-          <span class="tel-note">受付 9:30〜12:30／14:00〜17:00（土日祝休診）</span>
+          <span class="tel-note">受付 <span data-text="hours">9:30〜12:30／14:00〜17:00</span>（<span data-text="closed-short">土日祝</span>休診）</span>
         </span>
       </a>
       <a class="btn btn-tinted header-btn" href="#first-visit"><svg width="18" height="18"><use href="#i-doc"/></svg>初診の方へ</a>
@@ -175,7 +176,7 @@
         </table>
         <div class="schedule-notes" id="schedule-notes">
           <p data-today-note hidden></p>
-          <p>※土曜・日曜・祝日は休診です</p>
+          <p>※<span data-text="closed">土曜・日曜・祝日</span>は休診です</p>
           <p>※Web予約で待ち時間を短くできます</p>
         </div>
         <details class="demo-clock">
@@ -202,13 +203,13 @@
                 <th scope="col" data-day="1">月</th><th scope="col" data-day="2">火</th><th scope="col" data-day="3">水</th><th scope="col" data-day="4">木</th><th scope="col" data-day="5">金</th><th scope="col" data-day="6">土</th><th scope="col" data-day="0">日祝</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody data-week-body>
               <tr><th scope="row">9:30〜12:30</th><td data-day="1"><span class="mark-open" aria-label="診療">●</span></td><td data-day="2"><span class="mark-open" aria-label="診療">●</span></td><td data-day="3"><span class="mark-open" aria-label="診療">●</span></td><td data-day="4"><span class="mark-open" aria-label="診療">●</span></td><td data-day="5"><span class="mark-open" aria-label="診療">●</span></td><td data-day="6"><span class="mark-closed" aria-label="休診">／</span></td><td data-day="0"><span class="mark-closed" aria-label="休診">／</span></td></tr>
               <tr><th scope="row">14:00〜17:00</th><td data-day="1"><span class="mark-open" aria-label="診療">●</span></td><td data-day="2"><span class="mark-open" aria-label="診療">●</span></td><td data-day="3"><span class="mark-open" aria-label="診療">●</span></td><td data-day="4"><span class="mark-open" aria-label="診療">●</span></td><td data-day="5"><span class="mark-open" aria-label="診療">●</span></td><td data-day="6"><span class="mark-closed" aria-label="休診">／</span></td><td data-day="0"><span class="mark-closed" aria-label="休診">／</span></td></tr>
             </tbody>
           </table>
         </div>
-        <p class="closed-days"><span class="tag">休診日</span>土曜・日曜・祝日</p>
+        <p class="closed-days"><span class="tag">休診日</span><span data-text="closed">土曜・日曜・祝日</span></p>
       </section>
       <a class="reserve-banner" href="#reserve">
         <span class="reserve-banner-icon"><svg width="32" height="32"><use href="#i-calendar"/></svg></span>
@@ -266,7 +267,7 @@
   <section class="section" id="news" aria-labelledby="news-title">
     <div class="container" style="max-width:860px">
       <h2 class="section-title" id="news-title"><span class="en">News</span><span class="ja">お知らせ</span></h2>
-      <div class="list-group news reveal">
+      <div class="list-group news reveal" data-news>
         <details><summary><svg class="chevron" width="16" height="16"><use href="#i-chevron"/></svg><span class="grow">10月30日午前休診のお知らせ</span></summary><p class="news-body">本文は現行サイトの掲載内容を反映します。</p></details>
         <details><summary><svg class="chevron" width="16" height="16"><use href="#i-chevron"/></svg><span class="grow">ベースアップ評価料について</span></summary><p class="news-body">本文は現行サイトの掲載内容を反映します。</p></details>
         <details><summary><svg class="chevron" width="16" height="16"><use href="#i-chevron"/></svg><span class="grow">メディア掲載</span></summary><p class="news-body">本文は現行サイトの掲載内容を反映します。</p></details>
@@ -401,7 +402,7 @@
                   <th scope="col" data-day="0">日祝</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody data-week-body>
                 <tr>
                   <th scope="row">9:30〜12:30</th>
                   <td data-day="1"><span class="mark-open" aria-label="診療">●</span></td>
@@ -425,7 +426,7 @@
               </tbody>
             </table>
           </div>
-          <p style="margin:var(--s2) 0 0"><span class="tag" style="background:#fff;color:var(--taupe)">休診日</span>　土曜・日曜・祝日</p>
+          <p style="margin:var(--s2) 0 0"><span class="tag" style="background:#fff;color:var(--taupe)">休診日</span>　<span data-text="closed">土曜・日曜・祝日</span></p>
         </div>
         <div>
           <iframe class="map-embed" title="牛込柳町弁天眼科クリニックの地図" loading="lazy" referrerpolicy="no-referrer-when-downgrade"

@@ -602,3 +602,33 @@ body.admin {
 .thumb-actions + .form-row {
   border-top: 0;
 }
+
+/* 長いタイトルでカードが編集欄からはみ出さないように */
+.editor-list {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.item-card,
+.item-head {
+  min-width: 0;
+}
+
+.item-head .item-title {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.admin-editor .form-card input[type="text"],
+.admin-editor .form-card textarea {
+  width: 100%;
+  min-width: 0;
+}
+
+.preview-stage[data-device="pc"] {
+  justify-content: flex-start;
+}
+
+.preview-stage[data-device="pc"] iframe {
+  flex: none;
+  transform-origin: 0 0;
+}

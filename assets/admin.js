@@ -532,6 +532,23 @@
     }
   }
 
+  function fitPreview() {
+    var stage = $("[data-stage]");
+    var frame = $("[data-preview]");
+    if (!stage || !frame) return;
+    if (stage.dataset.device !== "pc" || !stage.clientWidth) {
+      frame.style.width = "";
+      frame.style.height = "";
+      frame.style.transform = "";
+      return;
+    }
+    var w = 1280;
+    var scale = Math.min(1, stage.clientWidth / w);
+    frame.style.width = w + "px";
+    frame.style.height = stage.clientHeight / scale + "px";
+    frame.style.transform = "scale(" + scale + ")";
+  }
+
   function renderAll() {
     renderSpecial();
     renderNews();
@@ -561,6 +578,7 @@
       b.addEventListener("click", function () {
         $all("[data-view]").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
         $("[data-layout]").dataset.mode = b.dataset.view;
+        fitPreview();
         pushPreview();
       });
     });
@@ -569,8 +587,21 @@
       b.addEventListener("click", function () {
         $all("button[data-device]").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
         $("[data-stage]").dataset.device = b.dataset.device;
+        fitPreview();
       });
     });
+
+    // 狭い画面ではプレビューをスマホ幅から始める
+    if (window.innerWidth < 744) {
+      $("[data-stage]").dataset.device = "sp";
+      $all("button[data-device]").forEach(function (x) {
+        x.setAttribute("aria-pressed", String(x.dataset.device === "sp"));
+      });
+    }
+
+    // PC表示は 1280px 幅で描いて枠に合わせて縮小
+    window.addEventListener("resize", fitPreview);
+    fitPreview();
 
     $("[data-preview]").addEventListener("load", pushPreview);
 

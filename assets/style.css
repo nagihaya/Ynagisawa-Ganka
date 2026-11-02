@@ -2493,3 +2493,26 @@ a.list-row:hover {
     text-decoration: none;
   }
 }
+
+.global-nav a {
+  white-space: nowrap;
+}
+
+/* PC幅の狭め（960〜1199px）：電話の補足を隠して医院名を優先 */
+@media (min-width: 960px) and (max-width: 1199px) {
+  .tel-note {
+    display: none;
+  }
+  .tel-number {
+    font-size: 1.25rem;
+  }
+  .header-actions {
+    gap: 8px;
+  }
+  .header-btn {
+    padding: 0 16px;
+  }
+  .global-nav a {
+    font-size: var(--footnote);
+  }
+}

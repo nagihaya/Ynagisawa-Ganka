@@ -2942,3 +2942,25 @@ a.card:hover {
     background: #5e4440;
   }
 }
+
+/* 受付終了：グレーの塗りつぶし */
+.slot.is-done {
+  background: #d9d5d1;
+  color: #4a4541;
+}
+
+.slot.is-done .slot-state {
+  background: #4a4541;
+  color: #fff;
+}
+
+@media (prefers-color-scheme: dark) {
+  .slot.is-done {
+    background: #3d3936;
+    color: rgba(255, 255, 255, 0.8);
+  }
+  .slot.is-done .slot-state {
+    background: rgba(255, 255, 255, 0.85);
+    color: #2a2624;
+  }
+}

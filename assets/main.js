@@ -91,69 +91,61 @@
 
   var demoNow = null;
 
+  function pad(n) {
+    return n < 10 ? "0" + n : String(n);
+  }
+
+  function hhmm(min) {
+    return pad(Math.floor(min / 60)) + ":" + pad(min % 60);
+  }
+
+  // 1マス分のHTML。本日のみ「受付中／受付終了」を添える
+  function cellHTML(slot, isToday, min) {
+    if (slot.closed) {
+      var label = slot.closed === "臨時休診" ? "臨時休診" : "休診";
+      var cls = slot.closed === "臨時休診" ? "is-special" : "is-closed";
+      return '<td><span class="slot ' + cls + '">' + label + "</span></td>";
+    }
+    var time = hhmm(slot.range[0]) + " - " + hhmm(slot.range[1]);
+    var state = "";
+    var cls2 = "is-open";
+    if (isToday) {
+      var st = stateOf(slot, min);
+      if (st === "open") state = '<span class="slot-state">受付中</span>';
+      if (st === "after") {
+        state = '<span class="slot-state">受付終了</span>';
+        cls2 = "is-done";
+      }
+    }
+    return '<td><span class="slot ' + cls2 + '">' + time + state + "</span></td>";
+  }
+
   function renderToday() {
     var root = document.querySelector("[data-today]");
     if (!root) return;
     var now = demoNow || new Date();
     var min = now.getHours() * 60 + now.getMinutes();
-    var s = sessionsFor(now);
-    var am = stateOf(s.am, min);
-    var pm = stateOf(s.pm, min);
+    var rows = "";
+    var notes = [];
 
+    for (var i = 0; i < 3; i++) {
+      var d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i);
+      var s = sessionsFor(d);
+      var label = i === 0
+        ? "本日"
+        : pad(d.getMonth() + 1) + "." + pad(d.getDate()) + "(" + DAY[d.getDay()] + ")";
+      rows += '<tr><th scope="row">' + label + "</th>" +
+        cellHTML(s.am, i === 0, min) + cellHTML(s.pm, i === 0, min) + "</tr>";
+      if (s.note) notes.push("※" + s.note);
+    }
+
+    root.querySelector("[data-schedule-body]").innerHTML = rows;
     root.querySelector("[data-today-date]").textContent =
       (now.getMonth() + 1) + "月" + now.getDate() + "日（" + DAY[now.getDay()] + "） " + fmt(min) + " 現在";
 
-    var LABEL = { open: "受付中", before: "受付前", after: "受付終了", closed: "休診" };
-    [["am", am, s.am], ["pm", pm, s.pm]].forEach(function (x) {
-      var el = root.querySelector("[data-session='" + x[0] + "']");
-      var text = x[1] === "closed" ? (x[2].closed === "臨時休診" ? "臨時休診" : "休診") : LABEL[x[1]];
-      el.textContent = text;
-      el.className = "session-state is-" + x[1];
-    });
-
-    var pill = root.querySelector("[data-today-pill]");
-    var msg = root.querySelector("[data-today-message]");
-    var next = nextOpening(now);
-    var pillText, pillClass, text;
-
-    if (am === "closed" && pm === "closed") {
-      pillText = "本日休診";
-      pillClass = "pill-off";
-      text = s.am.closed + "のため休診です。" + (next ? "次の受付は " + next + " からです。" : "");
-    } else if (am === "open" || pm === "open") {
-      var cur = am === "open" ? s.am : s.pm;
-      pillText = "受付中";
-      pillClass = "pill-open";
-      text = fmt(cur.range[1]) + " まで受付しています。";
-    } else if (s.am.closed === "臨時休診" || s.pm.closed === "臨時休診") {
-      var which = s.am.closed ? "午前" : "午後";
-      pillText = which + "休診";
-      pillClass = "pill-warn";
-      text = "本日は" + which + "休診です。" +
-        (which === "午前" && pm === "before"
-          ? "午後は " + fmt(s.pm.range[0]) + " から受付します。"
-          : next ? "次の受付は " + next + " からです。" : "");
-    } else if (am === "after" && pm === "before") {
-      pillText = "昼休み";
-      pillClass = "pill-closed";
-      text = "午後は " + fmt(s.pm.range[0]) + " から受付します。";
-    } else if (am === "before" || pm === "before") {
-      pillText = "受付前";
-      pillClass = "pill-closed";
-      text = next + " から受付します。";
-    } else {
-      pillText = "本日の受付終了";
-      pillClass = "pill-closed";
-      text = next ? "次の受付は " + next + " からです。" : "";
-    }
-
-    pill.textContent = pillText;
-    pill.className = "pill " + pillClass;
-    msg.textContent = text;
-
     var note = root.querySelector("[data-today-note]");
-    note.hidden = !s.note;
-    note.textContent = s.note || "";
+    note.hidden = !notes.length;
+    note.textContent = notes.join(" ");
   }
 
   function setupToday() {

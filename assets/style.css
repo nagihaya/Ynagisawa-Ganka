@@ -2550,3 +2550,197 @@ a.list-row:hover {
     filter: brightness(1.35);
   }
 }
+
+/* ---------- 診察スケジュール（本日から3日間） ---------- */
+.schedule-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  padding-bottom: var(--s2);
+  border-bottom: 1px solid var(--separator);
+}
+
+.schedule-icon {
+  color: var(--tint);
+}
+
+.schedule-head h2 {
+  margin: 0;
+  font-size: var(--title2);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+}
+
+.schedule-head .today-date {
+  margin-left: auto;
+}
+
+.schedule {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 12px;
+  margin: var(--s1) -12px 0;
+  width: calc(100% + 24px);
+  table-layout: fixed;
+}
+
+.schedule thead th {
+  font-weight: 500;
+  color: var(--accent);
+  font-size: var(--callout);
+  padding: 0;
+}
+
+.schedule thead td,
+.schedule tbody th {
+  width: 30%;
+}
+
+.schedule tbody th {
+  text-align: left;
+  font-size: var(--title3);
+  font-weight: 700;
+  color: var(--accent);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.schedule td {
+  padding: 0;
+}
+
+.slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 64px;
+  padding: 8px 4px;
+  border-radius: 6px;
+  color: #fff;
+  font-size: var(--title3);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.3;
+  text-align: center;
+}
+
+.slot.is-open {
+  background: var(--accent);
+}
+
+.slot.is-done {
+  background: var(--tint);
+}
+
+.slot.is-special {
+  background: #d9a99d;
+}
+
+.slot.is-closed {
+  background: #cfcbc8;
+}
+
+.slot-state {
+  margin-top: 4px;
+  padding: 1px 10px;
+  border-radius: 980px;
+  background: rgba(255, 255, 255, 0.22);
+  font-size: var(--caption);
+  font-weight: 600;
+}
+
+@media (prefers-color-scheme: dark) {
+  .slot.is-closed {
+    background: #48443f;
+    color: rgba(255, 255, 255, 0.7);
+  }
+  .slot.is-special {
+    background: #8f5f55;
+  }
+}
+
+.schedule-notes {
+  text-align: right;
+  font-size: var(--subhead);
+  color: var(--label-secondary);
+}
+
+.hero .schedule-notes p {
+  margin: 4px 0 0;
+  max-width: none;
+  font-size: var(--subhead);
+}
+
+.hero .schedule-notes p[data-today-note] {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+@media (max-width: 599px) {
+  .schedule {
+    border-spacing: 6px;
+    margin: var(--s1) -6px 0;
+    width: calc(100% + 12px);
+  }
+  .schedule thead td,
+  .schedule tbody th {
+    width: 27%;
+  }
+  .schedule tbody th {
+    font-size: var(--subhead);
+  }
+  .slot {
+    min-height: 52px;
+    font-size: var(--subhead);
+  }
+  .schedule-notes,
+  .hero .schedule-notes p {
+    font-size: var(--footnote);
+    text-align: left;
+  }
+}
+
+/* 休診・臨時休診は文字を濃くして読みやすく */
+.slot.is-closed {
+  background: #e4e1de;
+  color: #6b6560;
+}
+
+.slot.is-special {
+  background: #f2ddd7;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+@media (prefers-color-scheme: dark) {
+  .slot.is-closed {
+    background: #3a3633;
+    color: rgba(255, 255, 255, 0.7);
+  }
+  .slot.is-special {
+    background: #5a3a36;
+    color: #f2c9c0;
+  }
+}
+
+.slot {
+  white-space: nowrap;
+}
+
+@media (max-width: 599px) {
+  .schedule-card {
+    padding: var(--s2);
+  }
+  .schedule tbody th {
+    font-size: var(--footnote);
+  }
+  .slot {
+    font-size: var(--footnote);
+    letter-spacing: 0;
+  }
+  .schedule-head h2 {
+    font-size: var(--title3);
+  }
+}

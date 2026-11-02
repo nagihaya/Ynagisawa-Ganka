@@ -156,33 +156,33 @@
           </button>
         </div>
       </div>
-      <section class="today-card" id="hours" aria-labelledby="today-title" data-today>
-        <div class="today-head">
-          <h2 id="today-title">本日の受付状況</h2>
+      <section class="today-card schedule-card" id="hours" aria-labelledby="today-title" data-today>
+        <div class="schedule-head">
+          <svg class="schedule-icon" width="28" height="28"><use href="#i-eye"/></svg>
+          <h2 id="today-title">診察スケジュール</h2>
           <time class="today-date" data-today-date></time>
         </div>
-        <div class="today-main" aria-live="polite">
-          <span class="pill pill-closed" data-today-pill>確認中</span>
-          <p class="today-message" data-today-message>受付状況を確認しています</p>
+        <table class="schedule" aria-describedby="schedule-notes">
+          <caption class="visually-hidden">本日から3日間の受付時間</caption>
+          <thead>
+            <tr>
+              <td></td>
+              <th scope="col">午前</th>
+              <th scope="col">午後</th>
+            </tr>
+          </thead>
+          <tbody data-schedule-body></tbody>
+        </table>
+        <div class="schedule-notes" id="schedule-notes">
+          <p data-today-note hidden></p>
+          <p>※土曜・日曜・祝日は休診です</p>
+          <p>※Web予約で待ち時間を短くできます</p>
         </div>
-        <div class="today-sessions">
-          <div class="session">
-            <span class="session-name">午前</span>
-            <span class="session-time">9:30〜12:30</span>
-            <span class="session-state" data-session="am">―</span>
-          </div>
-          <div class="session">
-            <span class="session-name">午後</span>
-            <span class="session-time">14:00〜17:00</span>
-            <span class="session-state" data-session="pm">―</span>
-          </div>
-        </div>
-        <p class="today-note" data-today-note hidden></p>
         <details class="demo-clock">
           <summary>デモ用：日時を変えて表示を確認</summary>
           <div class="demo-clock-body">
             <label>日時 <input type="datetime-local" data-demo-now></label>
-            <button type="button" class="btn btn-tinted btn-small" data-demo-sample="2026-10-30T10:00">10/30 午前（臨時休診）</button>
+            <button type="button" class="btn btn-tinted btn-small" data-demo-sample="2026-10-29T15:00">10/29（翌日が午前休診）</button>
             <button type="button" class="btn btn-tinted btn-small" data-demo-sample="2026-11-02T10:30">平日 10:30</button>
             <button type="button" class="btn btn-tinted btn-small" data-demo-sample="2026-11-02T13:30">平日 昼休み</button>
             <button type="button" class="btn btn-tinted btn-small" data-demo-sample="2026-11-03T10:00">祝日</button>

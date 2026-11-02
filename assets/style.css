@@ -2516,3 +2516,37 @@ a.list-row:hover {
     font-size: var(--footnote);
   }
 }
+
+/* 医院ロゴ（SVG） */
+.logo-img {
+  display: block;
+  height: 46px;
+  width: auto;
+  max-width: 100%;
+}
+
+@media (max-width: 959px) {
+  .logo-img {
+    height: auto;
+    width: 230px;
+  }
+}
+
+@media (max-width: 359px) {
+  .logo-img {
+    width: 100%;
+    max-width: 190px;
+  }
+}
+
+@media (min-width: 960px) and (max-width: 1199px) {
+  .logo-img {
+    height: 40px;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .logo-img {
+    filter: brightness(1.35);
+  }
+}

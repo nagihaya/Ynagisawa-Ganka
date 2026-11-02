@@ -192,6 +192,7 @@
       sheet.dataset.open = "true";
       openBtn.setAttribute("aria-expanded", "true");
       document.body.style.overflow = "hidden";
+      if (lenis) lenis.stop();
       var first = sheet.querySelector("button, a");
       if (first) first.focus();
     }
@@ -199,6 +200,7 @@
       sheet.dataset.open = "false";
       openBtn.setAttribute("aria-expanded", "false");
       document.body.style.overflow = "";
+      if (lenis) lenis.start();
       if (lastFocus) lastFocus.focus();
     }
 
@@ -483,11 +485,29 @@
     }
     if (e.data && e.data.type === "clinic-scroll" && e.data.target) {
       var el = document.getElementById(e.data.target);
-      if (el) el.scrollIntoView({ block: "start" });
+      if (el) {
+        if (lenis) lenis.scrollTo(el, { immediate: true });
+        else el.scrollIntoView({ block: "start" });
+      }
     }
   });
 
+  // なめらかスクロール（Lenis）。「視差効果を減らす」設定では使わない
+  var lenis = null;
+
+  function setupSmoothScroll() {
+    if (!window.Lenis) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    lenis = new window.Lenis({
+      autoRaf: true,
+      anchors: true,
+      lerp: 0.1,
+      smoothWheel: true
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
+    setupSmoothScroll();
     setupCarousel();
     if (window.CLINIC_DATA) applyData(loadData());
     setupToday();

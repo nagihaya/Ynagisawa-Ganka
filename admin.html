@@ -41,6 +41,7 @@
       <button type="button" role="tab" aria-selected="true" aria-pressed="true" data-tab="special">臨時休診</button>
       <button type="button" role="tab" aria-selected="false" aria-pressed="false" data-tab="news">お知らせ</button>
       <button type="button" role="tab" aria-selected="false" aria-pressed="false" data-tab="hours">受付時間</button>
+      <button type="button" role="tab" aria-selected="false" aria-pressed="false" data-tab="slides">写真</button>
     </div>
 
     <!-- 臨時休診 -->
@@ -113,6 +114,20 @@
         </div>
         <p class="group-caption">祝日は2026〜2027年分を登録済みです。</p>
       </div>
+    </section>
+
+    <!-- 写真（スライドショー） -->
+    <section class="editor-panel" data-panel="slides" aria-labelledby="h-slides" hidden>
+      <div class="panel-head">
+        <div>
+          <h1 id="h-slides">スライドショーの写真</h1>
+          <p>トップの写真を入れ替えます。横長（16:9）の写真がきれいに収まります。</p>
+        </div>
+        <button type="button" class="btn btn-accent btn-small" data-add="slides">＋ 追加</button>
+      </div>
+      <div class="editor-list" data-list="slides"></div>
+      <p class="group-caption" data-slides-size></p>
+      <input type="file" accept="image/*" data-file hidden>
     </section>
 
     <p class="admin-note">提案用デモのため、「保存」はこのブラウザの中だけに記録されます。本番では「書き出し」で作った <code>data.js</code> をサーバーの <code>assets/data.js</code> と置き換えるか、ログイン付きの管理画面（CMS）につなぎます。</p>

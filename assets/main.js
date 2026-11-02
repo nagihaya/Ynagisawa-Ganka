@@ -260,12 +260,41 @@
   }
 
   // 院内写真スライドショー（スワイプ対応・自動送り・一時停止）
+  var PLACEHOLDER_BG = [
+    "linear-gradient(135deg,#f6eeea,#e7d3ca)",
+    "linear-gradient(135deg,#f3ece4,#dcc8b9)",
+    "linear-gradient(135deg,#eef0f2,#d9d4d0)",
+    "linear-gradient(135deg,#f5ebe8,#e0c6bf)"
+  ];
+
+  // スライドとページコントロールを作り直す
+  function renderSlides(slides) {
+    var root = document.querySelector("[data-carousel]");
+    if (!root || !slides) return;
+    var track = root.querySelector("[data-track]");
+    var n = slides.length;
+    track.innerHTML = slides.map(function (s, i) {
+      var label = esc(s.label || "");
+      var inner = s.image
+        ? '<img src="' + esc(s.image) + '" alt="' + esc(s.alt || s.label || "院内写真") + '"' + (i ? ' loading="lazy"' : "") + ">" +
+          (label ? '<span class="slide-chip">' + label + "</span>" : "")
+        : '<span class="slide-label">' + label + '</span><span class="slide-note">院内写真を差し替え予定</span>';
+      return '<li class="slide" role="group" aria-roledescription="スライド" aria-label="' + (i + 1) + " / " + n + (label ? "：" + label : "") + '">' +
+        '<div class="slide-photo' + (s.image ? " has-image" : "") + '"' + (s.image ? "" : ' style="background:' + PLACEHOLDER_BG[i % PLACEHOLDER_BG.length] + '"') + ">" +
+        inner + "</div></li>";
+    }).join("");
+    root.querySelector(".page-control").innerHTML = slides.map(function (s, i) {
+      return '<button type="button" aria-label="' + (i + 1) + "枚目" + (s.label ? "：" + esc(s.label) : "") + '" data-slide-to="' + i + '"></button>';
+    }).join("");
+    root.classList.toggle("is-single", n <= 1);
+    root.hidden = n === 0;
+    if (root._refresh) root._refresh();
+  }
+
   function setupCarousel() {
     var root = document.querySelector("[data-carousel]");
     if (!root) return;
     var track = root.querySelector("[data-track]");
-    var slides = track.children;
-    var dots = root.querySelectorAll("[data-slide-to]");
     var toggle = root.querySelector("[data-toggle]");
     var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     var index = 0;
@@ -273,20 +302,26 @@
     var hold = false;
     var timer = null;
 
+    function count() {
+      return track.children.length;
+    }
+
     function go(i) {
-      index = (i + slides.length) % slides.length;
+      var n = count();
+      if (!n) return;
+      index = (i + n) % n;
       track.scrollTo({ left: track.clientWidth * index, behavior: reduce ? "auto" : "smooth" });
     }
 
     function mark() {
-      dots.forEach(function (d, i) {
+      root.querySelectorAll("[data-slide-to]").forEach(function (d, i) {
         d.setAttribute("aria-current", String(i === index));
       });
     }
 
     function tick() {
       clearInterval(timer);
-      if (playing) {
+      if (playing && count() > 1) {
         timer = setInterval(function () {
           if (!hold && !document.hidden) go(index + 1);
         }, 5000);
@@ -310,11 +345,11 @@
       }, 80);
     });
 
-    dots.forEach(function (d) {
-      d.addEventListener("click", function () {
-        go(Number(d.dataset.slideTo));
-        tick();
-      });
+    root.querySelector(".page-control").addEventListener("click", function (e) {
+      var d = e.target.closest("[data-slide-to]");
+      if (!d) return;
+      go(Number(d.dataset.slideTo));
+      tick();
     });
 
     root.querySelector("[data-prev]").addEventListener("click", function () {
@@ -346,9 +381,18 @@
       track.scrollTo({ left: track.clientWidth * index, behavior: "auto" });
     });
 
+    // スライドを作り直したときに呼ぶ
+    root._refresh = function () {
+      if (index >= count()) index = 0;
+      track.scrollTo({ left: track.clientWidth * index, behavior: "auto" });
+      mark();
+      tick();
+    };
+
     mark();
     setPlaying(playing);
   }
+
 
   function esc(s) {
     return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
@@ -413,6 +457,7 @@
     });
     renderWeekTables();
     renderNews();
+    if (data.slides) renderSlides(data.slides);
     renderToday();
     highlightToday();
   }
@@ -422,7 +467,11 @@
     var base = window.CLINIC_DATA;
     try {
       var saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        var d = JSON.parse(saved);
+        if (!d.slides) d.slides = base.slides;
+        return d;
+      }
     } catch (e) {}
     return base;
   }
@@ -431,6 +480,10 @@
   window.addEventListener("message", function (e) {
     if (e.data && e.data.type === "clinic-preview" && e.data.data) {
       applyData(e.data.data);
+    }
+    if (e.data && e.data.type === "clinic-scroll" && e.data.target) {
+      var el = document.getElementById(e.data.target);
+      if (el) el.scrollIntoView({ block: "start" });
     }
   });
 

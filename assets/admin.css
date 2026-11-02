@@ -532,3 +532,73 @@ body.admin {
   font-weight: 600;
   max-width: calc(100% - 32px);
 }
+
+/* 写真の編集 */
+.slide-thumb {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  padding: 0;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg-secondary);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  font: inherit;
+  color: var(--label-secondary);
+}
+
+.slide-thumb img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.slide-thumb:hover .thumb-empty,
+.slide-thumb.is-drop .thumb-empty {
+  color: var(--accent);
+  border-color: var(--tint);
+}
+
+.slide-thumb.is-drop {
+  outline: 3px solid var(--tint);
+  outline-offset: -3px;
+}
+
+.thumb-empty {
+  position: absolute;
+  inset: 12px;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-m);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: var(--subhead);
+  font-weight: 600;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.thumb-empty small {
+  font-weight: 400;
+  font-size: var(--caption);
+}
+
+.thumb-actions {
+  border-bottom: 1px solid var(--line);
+}
+
+.thumb-actions .detail {
+  font-size: var(--footnote);
+  color: var(--label-secondary);
+}
+
+.form-row + .form-row.thumb-actions,
+.thumb-actions + .form-row {
+  border-top: 0;
+}

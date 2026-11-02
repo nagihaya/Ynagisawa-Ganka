@@ -14,6 +14,12 @@ window.CLINIC_DATA = {
     },
     "holidayClosed": true
   },
+  "slides": [
+    { "label": "受付", "alt": "受付", "image": "" },
+    { "label": "待合室", "alt": "待合室", "image": "" },
+    { "label": "検査室", "alt": "検査室", "image": "" },
+    { "label": "診察室", "alt": "診察室", "image": "" }
+  ],
   "special": [
     {
       "date": "2026-10-30",

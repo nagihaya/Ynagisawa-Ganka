@@ -17,9 +17,14 @@
   function load() {
     try {
       var saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) return JSON.parse(saved);
+      if (saved) return withDefaults(JSON.parse(saved));
     } catch (e) {}
     return clone(original);
+  }
+
+  function withDefaults(d) {
+    if (!d.slides) d.slides = clone(original.slides || []);
+    return d;
   }
 
   function $(sel, root) {
@@ -254,6 +259,163 @@
     });
   }
 
+  // ---------- 写真（スライドショー） ----------
+  var ICON_PHOTO = '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-8 8"/></svg>';
+  var pickTarget = null;
+
+  function sizeKB(dataUrl) {
+    return dataUrl ? Math.round(dataUrl.length * 0.75 / 1024) : 0;
+  }
+
+  function renderSlides() {
+    var list = $("[data-list='slides']");
+    var n = data.slides.length;
+    if (!n) {
+      list.innerHTML = '<p class="empty">写真がありません。「＋ 追加」から登録できます。</p>';
+    } else {
+      list.innerHTML = data.slides.map(function (s, i) {
+        var thumb = s.image
+          ? '<img src="' + esc(s.image) + '" alt="">'
+          : '<span class="thumb-empty">' + ICON_PHOTO + "<span>写真を選ぶ<br><small>またはここにドロップ</small></span></span>";
+        return '<article class="item-card" data-index="' + i + '">' +
+          '<div class="item-head">' +
+            '<span class="item-num">' + (i + 1) + "</span>" +
+            '<strong class="item-title">' + esc(s.label || "（名前未入力）") + "</strong>" +
+            '<button type="button" class="icon-btn" data-move="-1" aria-label="前へ移動"' + (i === 0 ? " disabled" : "") + ">" + ICON_UP + "</button>" +
+            '<button type="button" class="icon-btn" data-move="1" aria-label="後ろへ移動"' + (i === n - 1 ? " disabled" : "") + ">" + ICON_DOWN + "</button>" +
+            '<button type="button" class="icon-btn" data-del aria-label="この写真を削除">' + ICON_TRASH + "</button>" +
+          "</div>" +
+          '<div class="form-card">' +
+            '<button type="button" class="slide-thumb" data-pick aria-label="' + (s.image ? "写真を変更" : "写真を選ぶ") + '">' + thumb + "</button>" +
+            (s.image
+              ? '<div class="form-row thumb-actions"><span class="detail">約 ' + sizeKB(s.image) + ' KB</span>' +
+                '<span><button type="button" class="btn btn-tinted btn-small" data-pick>写真を変更</button> ' +
+                '<button type="button" class="btn btn-plain btn-small" data-clear>外す</button></span></div>'
+              : "") +
+            '<label class="form-row is-stacked"><span class="form-label">名前（写真の左下に表示）</span><input type="text" data-f="label" value="' + esc(s.label) + '" placeholder="例：待合室"></label>' +
+            '<label class="form-row is-stacked"><span class="form-label">写真の説明（読み上げ用）</span><input type="text" data-f="alt" value="' + esc(s.alt) + '" placeholder="例：明るい待合室のソファ"></label>' +
+          "</div>" +
+        "</article>";
+      }).join("");
+    }
+    var total = data.slides.reduce(function (sum, s) { return sum + sizeKB(s.image); }, 0);
+    var info = $("[data-slides-size]");
+    info.textContent = total
+      ? "写真の合計：約 " + (total >= 1024 ? (total / 1024).toFixed(1) + " MB" : total + " KB") +
+        (total > 3500 ? "（多めです。保存できない場合は枚数を減らしてください）" : "")
+      : "写真は自動で縮小（最大 1600px）してから保存します。";
+  }
+
+  // 画像を縮小して data URL にする
+  function readImage(file, done) {
+    if (!file || !/^image\//.test(file.type)) {
+      toast("画像ファイルを選んでください");
+      return;
+    }
+    var reader = new FileReader();
+    reader.onload = function () {
+      var img = new Image();
+      img.onload = function () {
+        var max = 1600;
+        var scale = Math.min(1, max / Math.max(img.width, img.height));
+        var c = document.createElement("canvas");
+        c.width = Math.round(img.width * scale);
+        c.height = Math.round(img.height * scale);
+        var ctx = c.getContext("2d");
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(0, 0, c.width, c.height);
+        ctx.drawImage(img, 0, 0, c.width, c.height);
+        done(c.toDataURL("image/jpeg", 0.82));
+      };
+      img.onerror = function () { toast("この画像は読み込めませんでした"); };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function setImage(i, file) {
+    readImage(file, function (url) {
+      data.slides[i].image = url;
+      renderSlides();
+      changed();
+      toast("写真を入れ替えました");
+    });
+  }
+
+  function bindSlides() {
+    var list = $("[data-list='slides']");
+    var input = $("[data-file]");
+
+    input.addEventListener("change", function () {
+      if (pickTarget != null && input.files[0]) setImage(pickTarget, input.files[0]);
+      input.value = "";
+    });
+
+    list.addEventListener("input", function (e) {
+      var card = e.target.closest("[data-index]");
+      if (!card || !e.target.dataset.f) return;
+      var item = data.slides[Number(card.dataset.index)];
+      item[e.target.dataset.f] = e.target.value;
+      if (e.target.dataset.f === "label") {
+        $(".item-title", card).textContent = item.label || "（名前未入力）";
+      }
+      changed();
+    });
+
+    list.addEventListener("click", function (e) {
+      var card = e.target.closest("[data-index]");
+      if (!card) return;
+      var i = Number(card.dataset.index);
+      if (e.target.closest("[data-pick]")) {
+        pickTarget = i;
+        input.click();
+        return;
+      }
+      if (e.target.closest("[data-clear]")) {
+        data.slides[i].image = "";
+        renderSlides();
+        changed();
+        return;
+      }
+      var move = e.target.closest("[data-move]");
+      if (move) {
+        var j = i + Number(move.dataset.move);
+        var tmp = data.slides[i];
+        data.slides[i] = data.slides[j];
+        data.slides[j] = tmp;
+        renderSlides();
+        changed();
+        return;
+      }
+      if (e.target.closest("[data-del]")) {
+        if (!confirm("「" + (data.slides[i].label || "この写真") + "」を削除しますか？")) return;
+        data.slides.splice(i, 1);
+        renderSlides();
+        changed();
+      }
+    });
+
+    // ドラッグ＆ドロップ
+    list.addEventListener("dragover", function (e) {
+      var t = e.target.closest(".slide-thumb");
+      if (!t) return;
+      e.preventDefault();
+      t.classList.add("is-drop");
+    });
+    list.addEventListener("dragleave", function (e) {
+      var t = e.target.closest(".slide-thumb");
+      if (t) t.classList.remove("is-drop");
+    });
+    list.addEventListener("drop", function (e) {
+      var t = e.target.closest(".slide-thumb");
+      if (!t) return;
+      e.preventDefault();
+      t.classList.remove("is-drop");
+      var card = t.closest("[data-index]");
+      if (e.dataTransfer.files[0]) setImage(Number(card.dataset.index), e.dataTransfer.files[0]);
+    });
+  }
+
   // ---------- 保存・書き出し・元に戻す ----------
   function valid() {
     if (!validateHours()) {
@@ -281,7 +443,9 @@
       setDirty(false);
       toast("保存しました（このブラウザ）");
     } catch (e) {
-      toast("この環境では保存できません。「書き出し」をご利用ください");
+      toast(e && e.name === "QuotaExceededError"
+        ? "写真の容量が大きすぎて保存できません。枚数を減らすか「書き出し」をご利用ください"
+        : "この環境では保存できません。「書き出し」をご利用ください");
     }
   }
 
@@ -314,6 +478,17 @@
 
   // ---------- 追加 ----------
   function add(kind) {
+    if (kind === "slides") {
+      data.slides.push({ label: "", alt: "", image: "" });
+      renderSlides();
+      changed();
+      var cards = $all("[data-list='slides'] .item-card");
+      var last = cards[cards.length - 1];
+      if (last) last.scrollIntoView({ block: "center" });
+      pickTarget = data.slides.length - 1;
+      $("[data-file]").click();
+      return;
+    }
     if (kind === "special") {
       data.special.push({ date: today(), am: true, pm: false, note: "" });
       renderSpecial();
@@ -351,17 +526,17 @@
     });
     // 見たい場所へプレビューを移動
     var frame = $("[data-preview]");
-    try {
-      var doc = frame.contentDocument;
-      var target = doc && doc.getElementById(name === "news" ? "news" : "hours");
-      if (target) target.scrollIntoView({ block: "start" });
-    } catch (e) {}
+    var target = name === "news" ? "news" : name === "slides" ? "main" : "hours";
+    if (frame && frame.contentWindow) {
+      frame.contentWindow.postMessage({ type: "clinic-scroll", target: target }, "*");
+    }
   }
 
   function renderAll() {
     renderSpecial();
     renderNews();
     renderHours();
+    renderSlides();
   }
 
   document.addEventListener("DOMContentLoaded", function () {
@@ -369,6 +544,7 @@
     bindSpecial();
     bindNews();
     bindHours();
+    bindSlides();
     setDirty(false);
 
     $all("[data-tab]").forEach(function (b) {

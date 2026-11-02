@@ -2744,3 +2744,201 @@ a.list-row:hover {
     font-size: var(--title3);
   }
 }
+
+/* ==========================================================
+   線で囲むデザイン：影をやめ、細いグレーの線で区切る
+   ========================================================== */
+:root {
+  --line: #d8d4d0;
+  --line-strong: #bdb7b1;
+  --shadow: none;
+  --radius-l: 14px;
+  --radius-m: 10px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --line: rgba(255, 255, 255, 0.16);
+    --line-strong: rgba(255, 255, 255, 0.3);
+  }
+}
+
+.card,
+.list-group,
+.hours-wrap,
+.today-card,
+.point,
+.map-embed,
+.carousel-track,
+.status-card {
+  border: 1px solid var(--line);
+  box-shadow: none;
+}
+
+a.card:hover,
+a.list-row:hover {
+  border-color: var(--line-strong);
+}
+
+a.card:hover {
+  transform: none;
+}
+
+/* 区切り線もグレーで統一 */
+.list-row + .list-row::before,
+.news details + details,
+.hours th,
+.hours td,
+.schedule-head,
+.demo-clock,
+.faq details {
+  border-color: var(--line);
+}
+
+.list-row + .list-row::before {
+  border-top-width: 1px;
+}
+
+.news details + details {
+  border-top-width: 1px;
+}
+
+/* 見出しの下に細い線 */
+.section-title::after {
+  content: "";
+  display: block;
+  width: 40px;
+  height: 1px;
+  margin: var(--s2) auto 0;
+  background: var(--line-strong);
+}
+
+.band .section-title::after {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* 特長：番号の丸も線で */
+.point-num {
+  background: transparent;
+  border: 1px solid var(--line-strong);
+}
+
+/* 診療内容のチップ・帯の中のカード */
+.chips li {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.band .card {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+}
+
+/* 帯の中の写真枠に区切り線 */
+.clinic-photo {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+/* 受付時間表・院情報の表 */
+.hours-wrap {
+  background: var(--bg-elevated);
+}
+
+.footer-info .hours-wrap {
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+/* 予約バナー・予約の帯は線を足して締める */
+.reserve-banner,
+.cta {
+  box-shadow: none;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.reserve-banner:hover {
+  transform: none;
+  filter: brightness(1.05);
+}
+
+/* ボタン：薄い塗りのボタンは線で囲む */
+.btn-tinted {
+  background: var(--bg-elevated);
+  border: 1px solid var(--line-strong);
+  color: var(--tint-strong);
+}
+
+.btn-tinted:hover {
+  background: var(--tint-soft);
+}
+
+.cta .btn-tinted {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.6);
+  color: #fff;
+}
+
+/* 矢印・ページトップ・バッジは影を弱めて線で */
+.carousel-arrow,
+.page-top {
+  box-shadow: none;
+  border: 1px solid var(--line);
+}
+
+.reserve-badge {
+  box-shadow: none;
+}
+
+.page-control {
+  background: transparent;
+  border: 1px solid var(--line);
+}
+
+/* 診察スケジュールのマスは角を少し小さく */
+.slot {
+  border-radius: 4px;
+}
+
+.slot.is-closed {
+  background: transparent;
+  border: 1px solid var(--line);
+}
+
+.slot.is-special {
+  background: transparent;
+  border: 1px solid var(--tint);
+}
+
+/* セクションの境目に細い線 */
+.section + .section,
+.section-alt {
+  border-top: 1px solid var(--line);
+}
+
+.band,
+.band + .band {
+  border-top: 0;
+}
+
+/* ヘッダー下の線 */
+.site-header {
+  border-bottom: 1px solid var(--line);
+}
+
+.global-nav {
+  border-top: 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.global-nav li,
+.global-nav li:last-child {
+  border-color: var(--line);
+}
+
+@media (prefers-color-scheme: dark) {
+  .slot.is-open {
+    background: #8a4555;
+  }
+  .slot.is-done {
+    background: #5e4440;
+  }
+}

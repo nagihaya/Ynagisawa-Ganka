@@ -102,7 +102,8 @@
   // 1マス分のHTML。本日のみ「受付中／受付終了」を添える
   function cellHTML(slot, isToday, min) {
     if (slot.closed) {
-      var label = slot.closed === "臨時休診" ? "臨時休診" : "休診";
+      var label = slot.closed === "臨時休診" ? "臨時休診"
+        : slot.closed.indexOf("祝日") === 0 ? "祝日休診" : "休診";
       var cls = slot.closed === "臨時休診" ? "is-special" : "is-closed";
       return '<td><span class="slot ' + cls + '">' + label + "</span></td>";
     }
